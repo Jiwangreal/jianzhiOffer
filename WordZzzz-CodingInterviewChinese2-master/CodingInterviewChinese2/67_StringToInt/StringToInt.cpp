@@ -20,6 +20,12 @@ https://github.com/zhedahht/CodingInterviewChinese2/blob/master/LICENSE.txt)
 
 long long StrToIntCore(const char* str, bool minus);
 
+/*
+atoi是通过一个全局变量来区分：字符串为空和字符串为"0"的区别：
+若是非法输入，返回0并把这个全局变量设为一个特殊标记，若是"0"，则返回0，不会设置全局变量。
+
+'0'到'9'以及加号和减号都是合法字符
+*/
 enum Status {kValid = 0, kInvalid};
 int g_nStatus = kValid;
 
@@ -78,7 +84,8 @@ long long StrToIntCore(const char* digit, bool minus)
 
     return num;
 }
-
+// 解决数值转换本身的问题不难，但是候选者至少能把空指针NULL，空字符串""，正负号，溢出等方方面面都考虑到
+// 并在写代码的时候对这些特殊的输入都定义好合理的输出
 // ====================测试代码====================
 void Test(const char* string)
 {

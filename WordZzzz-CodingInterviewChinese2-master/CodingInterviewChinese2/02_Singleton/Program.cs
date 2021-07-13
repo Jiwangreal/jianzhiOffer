@@ -17,8 +17,10 @@ https://github.com/zhedahht/CodingInterviewChinese2/blob/master/LICENSE.txt)
 
 using System;
 
+// 将构造函数设为私有函数以禁止他人创建实例
 namespace _02_Singleton
 {
+    // （1）只是适用于单线程环境
     public sealed class Singleton1
     {
         private Singleton1()
@@ -26,6 +28,7 @@ namespace _02_Singleton
         }
 
         private static Singleton1 instance = null;
+        // 在静态熟悉Instance中，只有在instance为null时才创建一个实例以避免重复创建
         public static Singleton1 Instance
         {
             get
@@ -38,6 +41,7 @@ namespace _02_Singleton
         }
     }
 
+// （2）虽然多线程环境中工作但是效率不高的方法
     public sealed class Singleton2
     {
         private Singleton2()
@@ -51,6 +55,7 @@ namespace _02_Singleton
         {
             get
             {
+                // 加一把同步锁
                 lock (syncObj)
                 {
                     if (instance == null)
@@ -62,6 +67,7 @@ namespace _02_Singleton
         }
     }
 
+// （3）加锁前后两次判断实例是否已存在
     public sealed class Singleton3
     {
         private Singleton3()
@@ -75,6 +81,7 @@ namespace _02_Singleton
         {
             get
             {
+                // Singleton3只有当instance=null，即没有创建时，需要加锁操作，当instance已经创建出来之后，则无需加锁
                 if (instance == null)
                 {
                     lock (syncObj)
@@ -89,6 +96,7 @@ namespace _02_Singleton
         }
     }
 
+// （4）利用静态构造函数
     public sealed class Singleton4
     {
         private Singleton4()
@@ -101,6 +109,8 @@ namespace _02_Singleton
             Console.WriteLine("Singleton4 Print");
         }
 
+        // 由于C#是在调用静态构造函数时初始化静态变量，.NET运行时能够确保只调用一次静态构造函数，这样能能保证只初始化一次instance
+        // 该类型的静态构造函数是在第一次用到Singleton4时就会被创建
         private static Singleton4 instance = new Singleton4();
         public static Singleton4 Instance
         {
@@ -110,7 +120,7 @@ namespace _02_Singleton
             }
         }
     }
-
+// (5)按需创建实例
     public sealed class Singleton5
     {
         Singleton5()
@@ -122,7 +132,9 @@ namespace _02_Singleton
         {
             Console.WriteLine("Singleton5 Print");
         }
-
+        
+        // 当通过Singleton5.Instance得到Singleton5实例时,会自动调用Nested的静态构造函数创建实例Instance
+        // 如果我们不调用属性Singleton5.Instance,那么就不会触发.NET运行时调用Nested,也就不会创建实例,这样就做到了按需创建
         public static Singleton5 Instance
         {
             get
@@ -130,7 +142,7 @@ namespace _02_Singleton
                 return Nested.instance;
             }
         }
-
+        //类型Nested只在属性Singleton5.Instance中被用到,由于其私有属性,他人是无法使用Nested类型
         class Nested
         {
             static Nested()
